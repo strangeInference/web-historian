@@ -39,7 +39,6 @@ exports.handleRequest = function (req, res) {
     res.end(indexHtml);
   } else if (req.method === 'POST'){
     statusCode = 201;
-    archive.addUrlToList(req, res);
     res.writeHead(statusCode, headers);
     res.end(loadingHtml);
 

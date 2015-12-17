@@ -49,8 +49,8 @@ exports.addUrlToList = function(url, callback) {
   exports.isUrlInList(url, function(bool, array){
     if (!bool){
       array.push(url);
-      array = array.join('\n');
-      fs.writeFile(exports.paths.list, array, function(err){
+      var text = array.join('\n');
+      fs.writeFile(exports.paths.list, text, function(err){
         if (err){
           console.log("error writing file");
         } else {
