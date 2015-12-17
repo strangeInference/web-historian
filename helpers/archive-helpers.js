@@ -25,57 +25,58 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(callback) {
   var list;
-  fs.readFile('./archives/sites.txt', 'utf8', function(err, content){
+  fs.readFile(exports.paths.list, 'utf8', function(err, content){
     if (err) {
       console.log('error reading file');
     } else {
       list = content;
+      list = list.split('\n');
+      callback(list);
     }
-  })
-  return list;
+  });
 };
 
-exports.isUrlInList = function(url) {
-  var list = exports.readListOfUrls();
-  list = list.split('\n');
-  return list.indexOf(url) > -1;
+exports.isUrlInList = function(url, callback) {
+  exports.readListOfUrls(function(array){
+    callback(array.indexOf(url) !== -1);
+  });
 };
 
 exports.addUrlToList = function(req, res) {
-  var data = "";
-  req.on('data', function(chunk){
-    data += chunk;
-  });
-  req.on('end', function(){
-    if (exports.isUrlInList(data){
-      var list = exports.readListOfUrls();
-      list = list+data;
-      fs.writeFile('./archives/sites.txt', list, function(err){
-        if(err){
-          console.log('error writing file')
-        } else {
-          console.log('success writing file');
-        }
-      })      
-    })
-    var archive;
-    fs.readFile('./archives/sites.txt', 'utf8', function(err, content){
-      if (err){
-        console.log('error reading file');
-      }else {
-        archive = content + '\n' + data;
-        fs.writeFile("./archives/sites.txt", archive, function(err){
-          if (err){
-            console.log('error writing file');
-          } else{
+  // var data = "";
+  // req.on('data', function(chunk){
+  //   data += chunk;
+  // });
+  // req.on('end', function(){
+  //   if (exports.isUrlInList(data){
+  //     var list = exports.readListOfUrls();
+  //     list = list+data;
+  //     fs.writeFile('./archives/sites.txt', list, function(err){
+  //       if(err){
+  //         console.log('error writing file')
+  //       } else {
+  //         console.log('success writing file');
+  //       }
+  //     })      
+  //   })
+  //   var archive;
+  //   fs.readFile('./archives/sites.txt', 'utf8', function(err, content){
+  //     if (err){
+  //       console.log('error reading file');
+  //     }else {
+  //       archive = content + '\n' + data;
+  //       fs.writeFile("./archives/sites.txt", archive, function(err){
+  //         if (err){
+  //           console.log('error writing file');
+  //         } else{
             
-          }
-        })
-      }
-    })
-  });
+  //         }
+  //       })
+  //     }
+  //   })
+  // });
 };
 
 exports.isUrlArchived = function() {
