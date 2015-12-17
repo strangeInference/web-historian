@@ -26,9 +26,21 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function() {
+  var list;
+  fs.readFile('./archives/sites.txt', 'utf8', function(err, content){
+    if (err) {
+      console.log('error reading file');
+    } else {
+      list = content;
+    }
+  })
+  return list;
 };
 
-exports.isUrlInList = function() {
+exports.isUrlInList = function(url) {
+  var list = exports.readListOfUrls();
+  list = list.split('\n');
+  return list.indexOf(url) > -1;
 };
 
 exports.addUrlToList = function(req, res) {
@@ -37,6 +49,17 @@ exports.addUrlToList = function(req, res) {
     data += chunk;
   });
   req.on('end', function(){
+    if (exports.isUrlInList(data){
+      var list = exports.readListOfUrls();
+      list = list+data;
+      fs.writeFile('./archives/sites.txt', list, function(err){
+        if(err){
+          console.log('error writing file')
+        } else {
+          console.log('success writing file');
+        }
+      })      
+    })
     var archive;
     fs.readFile('./archives/sites.txt', 'utf8', function(err, content){
       if (err){
