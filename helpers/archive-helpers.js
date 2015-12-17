@@ -31,7 +31,29 @@ exports.readListOfUrls = function() {
 exports.isUrlInList = function() {
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(req, res) {
+  var data = "";
+  req.on('data', function(chunk){
+    data += chunk;
+  });
+  req.on('end', function(){
+    var archive;
+    fs.readFile('./archives/sites.txt', 'utf8', function(err, content){
+      if (err){
+        console.log('error reading file');
+      }else {
+        archive = content + data;
+        fs.writeFile("./archives/sites.txt", archive, function(err){
+          if (err){
+            console.log('error writing file');
+          } else{
+            res.writeHead(statusCode, headers);
+            res.end(alert('working on it'));
+          }
+        })
+      }
+    })
+  });
 };
 
 exports.isUrlArchived = function() {

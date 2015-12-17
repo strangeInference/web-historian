@@ -22,11 +22,16 @@ exports.handleRequest = function (req, res) {
 
   var statusCode = 200;
   var headers = defaultCorsHeaders;
+  headers['content-type'] = 'text/html';
 
   if (req.method === 'GET'){
-    headers['content-type'] = 'text/html';
+    
     res.writeHead(statusCode, headers);
     res.end(indexHtml);
+  } else if (req.method === 'POST'){
+    statusCode = 201;
+    archive.addUrlToList(req, res);
+
   }
 
   res.end(archive.paths.list);
