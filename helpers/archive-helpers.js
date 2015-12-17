@@ -42,13 +42,12 @@ exports.addUrlToList = function(req, res) {
       if (err){
         console.log('error reading file');
       }else {
-        archive = content + data;
+        archive = content + '\n' + data;
         fs.writeFile("./archives/sites.txt", archive, function(err){
           if (err){
             console.log('error writing file');
           } else{
-            res.writeHead(statusCode, headers);
-            res.end(alert('working on it'));
+            
           }
         })
       }

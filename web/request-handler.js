@@ -18,6 +18,15 @@ fs.readFile('./web/public/index.html', 'utf8', function(err, content){
   }
 })
 
+var loadingHtml;
+fs.readFile('./web/public/loading.html', 'utf8', function(err, content){
+  if (err){
+    console.log('file can not be read');
+  }else{
+    loadingHtml = content;
+  }
+})
+
 exports.handleRequest = function (req, res) {
 
   var statusCode = 200;
@@ -31,6 +40,8 @@ exports.handleRequest = function (req, res) {
   } else if (req.method === 'POST'){
     statusCode = 201;
     archive.addUrlToList(req, res);
+    res.writeHead(statusCode, headers);
+    res.end(loadingHtml);
 
   }
 
