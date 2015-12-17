@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -40,47 +41,60 @@ exports.readListOfUrls = function(callback) {
 
 exports.isUrlInList = function(url, callback) {
   exports.readListOfUrls(function(array){
-    callback(array.indexOf(url) !== -1);
+    callback(array.indexOf(url) !== -1, array);
   });
 };
 
-exports.addUrlToList = function(req, res) {
-  // var data = "";
-  // req.on('data', function(chunk){
-  //   data += chunk;
-  // });
-  // req.on('end', function(){
-  //   if (exports.isUrlInList(data){
-  //     var list = exports.readListOfUrls();
-  //     list = list+data;
-  //     fs.writeFile('./archives/sites.txt', list, function(err){
-  //       if(err){
-  //         console.log('error writing file')
-  //       } else {
-  //         console.log('success writing file');
-  //       }
-  //     })      
-  //   })
-  //   var archive;
-  //   fs.readFile('./archives/sites.txt', 'utf8', function(err, content){
-  //     if (err){
-  //       console.log('error reading file');
-  //     }else {
-  //       archive = content + '\n' + data;
-  //       fs.writeFile("./archives/sites.txt", archive, function(err){
-  //         if (err){
-  //           console.log('error writing file');
-  //         } else{
-            
-  //         }
-  //       })
-  //     }
-  //   })
-  // });
+exports.addUrlToList = function(url, callback) {
+  exports.isUrlInList(url, function(bool, array){
+    if (!bool){
+      array.push(url);
+      array = array.join('\n');
+      fs.writeFile(exports.paths.list, array, function(err){
+        if (err){
+          console.log("error writing file");
+        } else {
+          callback();
+        }
+      })
+    }
+  });
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(url, callback) {
+  fs.readdir(exports.paths.archivedSites, function(err, files){
+    if (err){
+      console.log('problem reading files');
+    } else {
+      callback(files.indexOf(url) !== -1);
+    }
+  });
 };
 
-exports.downloadUrls = function() {
+exports.downloadUrls = function(urlArray) {
+  // for each url in array
+  _.each(urlArray, function(url){
+    //search internet for url
+    http.get({
+      host: url,
+      path: '/'
+    }, function(response){
+      var htmlFile = '';
+      response.on('data', function(chunk){
+        htmlFile += chunk;
+      });
+      response.on('end', function(){
+        // download site html to archive and give name as url
+        fs.writeFile(exports.paths.archivedSites+'/'+url, htmlFile, function(err){
+          if(err){
+            console.log('error writing file');
+          } else{
+            console.log('you saved the website!');
+          }
+        });
+      });
+    })
+    .end();
+  });
 };
+//exports.downloadUrls(['www.google.com', 'www.autostraddle.com', 'www.hackreactor.com']);
