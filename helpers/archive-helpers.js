@@ -49,12 +49,14 @@ exports.addUrlToList = function(url, callback) {
   exports.isUrlInList(url, function(bool, array){
     if (!bool){
       array.push(url);
-      var text = array.join('\n');
-      fs.writeFile(exports.paths.list, text, function(err){
+      array = array.join('\n');
+      fs.writeFile(exports.paths.list, array, function(err){
         if (err){
           console.log("error writing file");
         } else {
-          callback();
+          if (callback){
+            callback();
+          }
         }
       })
     }
@@ -97,4 +99,4 @@ exports.downloadUrls = function(urlArray) {
     .end();
   });
 };
-//exports.downloadUrls(['www.google.com', 'www.autostraddle.com', 'www.hackreactor.com']);
+//exports.downloadUrls(['www.google.com', 'www.autostraddle.com']);

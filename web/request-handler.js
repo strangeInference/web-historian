@@ -28,7 +28,6 @@ fs.readFile('./web/public/loading.html', 'utf8', function(err, content){
 })
 
 exports.handleRequest = function (req, res) {
-
   var statusCode = 200;
   var headers = defaultCorsHeaders;
   headers['content-type'] = 'text/html';
@@ -39,10 +38,33 @@ exports.handleRequest = function (req, res) {
     res.end(indexHtml);
   } else if (req.method === 'POST'){
     statusCode = 201;
-    res.writeHead(statusCode, headers);
-    res.end(loadingHtml);
+    var body = '';
+    req.on('data', function(chunk){
+      body += chunk;
+    });
+    req.on('end', function(){
+      var slicedBody = body.slice(4);
+      archive.isUrlArchived(slicedBody, function(is){
+        if(is) {
+          fs.readFile('./archives/sites/'+ slicedBody, 'utf8', function(err, content){
+            if (err){
+              console.log('error reading file');
+            } else {
+              res.writeHead(statusCode, headers);
+              res.end(content);
+            }
+          });
+        } else {
+          statusCode = 302;
+          archive.addUrlToList(slicedBody);
+          res.writeHead(statusCode, headers);
+          res.end(loadingHtml);
+        }
+      });
+
+    });
 
   }
 
-  res.end(archive.paths.list);
+  //res.end(archive.paths.list);
 };
