@@ -75,6 +75,14 @@ exports.isUrlArchived = function(url, callback) {
 
 exports.downloadUrls = function(urlArray) {
   // for each url in array
+  fs.writeFile('./archives/sites.txt', '', function(err){
+    if(err){
+      console.log('could not erase contents of file');
+    } else{
+      console.log("erased file");
+    }
+  });
+
   _.each(urlArray, function(url){
     //search internet for url
     http.get({
